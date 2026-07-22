@@ -28,7 +28,7 @@ VALUES
   ('weekday-13', 'weekday', 13, 'Lopend-werkblok',                  410, 450, 'seminar_ongoing',  false, NULL,    NULL,    NOW(), NOW()),
   ('weekday-14', 'weekday', 14, 'Pauze',                            450, 465, 'break',            false, NULL,    NULL,    NOW(), NOW()),
   ('weekday-15', 'weekday', 15, 'Administratieblok',                465, 510, 'admin',            false, NULL,    NULL,    NOW(), NOW()),
-  ('weekday-16', 'weekday', 16, 'Pauze (indien Reserveblok doorgaat)', 510, 525, 'break',          false, NULL,    NULL,    NOW(), NOW()),
+  ('weekday-16', 'weekday', 16, 'Pauze',                            510, 525, 'break',            false, NULL,    NULL,    NOW(), NOW()),
   ('weekday-17', 'weekday', 17, 'Reserveblok',                      525, 570, 'block5',           false, NULL,    NULL,    NOW(), NOW()),
   ('weekday-18', 'weekday', 18, 'Terugreis',                        570, 600, 'transit',          false, NULL,    NULL,    NOW(), NOW()),
   ('weekday-19', 'weekday', 19, 'Avondblok',                        0,   0,   'evening',          true,  '18:00', '20:00', NOW(), NOW()),
