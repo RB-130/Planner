@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { addDays, formatDateShort, isWithinPlannerRange } from "@/lib/date";
+import { addDays, formatDateShort, isWithinPlannerRange, startOfWeek } from "@/lib/date";
 import { categoryStyle } from "@/lib/categories";
+import { DateJumpForm } from "@/components/DateJumpForm";
 import type { DaySchedule } from "@/lib/schedule";
 
 export function WeekView({ weekStart, days }: { weekStart: string; days: DaySchedule[] }) {
@@ -27,6 +28,11 @@ export function WeekView({ weekStart, days }: { weekStart: string; days: DaySche
         >
           volgende week →
         </Link>
+      </div>
+
+      <div className="flex items-center justify-center gap-2 text-sm">
+        <span className="text-neutral-500">Ga naar</span>
+        <DateJumpForm currentDate={weekStart} buildHref={(date) => `/week/${startOfWeek(date)}`} />
       </div>
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-7">

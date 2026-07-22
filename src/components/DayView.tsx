@@ -14,6 +14,7 @@ import {
 import { SortableContext, arrayMove, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { SortableRow } from "@/components/SortableRow";
 import { ItemCard } from "@/components/ItemCard";
+import { DateJumpForm } from "@/components/DateJumpForm";
 import { addDays, formatDateLong, isWithinPlannerRange, startOfWeek, timeToMinutes, minutesToTime } from "@/lib/date";
 import type { DaySchedule } from "@/lib/schedule";
 
@@ -179,6 +180,11 @@ export function DayView({ initial }: { initial: DaySchedule }) {
         >
           volgende dag →
         </Link>
+      </div>
+
+      <div className="flex items-center justify-center gap-2 text-sm">
+        <span className="text-neutral-500">Ga naar</span>
+        <DateJumpForm currentDate={schedule.date} buildHref={(date) => `/day/${date}`} />
       </div>
 
       <h1 className="text-xl font-semibold capitalize">{formatDateLong(schedule.date)}</h1>
