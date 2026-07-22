@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { PLANNER_END, PLANNER_START } from "@/lib/date";
+import { PLANNER_END, PLANNER_START, clampToPlannerRange } from "@/lib/date";
 
 export function DateJumpForm({
   currentDate,
@@ -19,7 +19,9 @@ export function DateJumpForm({
       min={PLANNER_START}
       max={PLANNER_END}
       onChange={(e) => {
-        if (e.target.value) router.push(buildHref(e.target.value));
+        // De browser-datumkiezer respecteert min/max meestal, maar niet altijd
+        // (bv. handmatig getypte datums) — daarom hier ook expliciet begrenzen.
+        if (e.target.value) router.push(buildHref(clampToPlannerRange(e.target.value)));
       }}
       aria-label="Ga naar datum"
       className="rounded border border-black/20 px-2 py-1 text-sm dark:border-white/20 dark:bg-black"

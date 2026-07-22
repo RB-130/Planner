@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { WeekView } from "@/components/WeekView";
-import { getDaySchedule } from "@/lib/getDaySchedule";
-import { addDays, isWithinPlannerRange, startOfWeek } from "@/lib/date";
+import { getWeekSchedule } from "@/lib/getWeekSchedule";
+import { isWithinPlannerRange, startOfWeek } from "@/lib/date";
 
 export default async function WeekPage({ params }: PageProps<"/week/[date]">) {
   const { date } = await params;
@@ -10,9 +10,7 @@ export default async function WeekPage({ params }: PageProps<"/week/[date]">) {
     notFound();
   }
 
-  const weekStart = startOfWeek(date);
-  const dateKeys = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
-  const days = await Promise.all(dateKeys.map((d) => getDaySchedule(d)));
+  const { weekStart, days } = await getWeekSchedule(startOfWeek(date));
 
   return <WeekView weekStart={weekStart} days={days} />;
 }
