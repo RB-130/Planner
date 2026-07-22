@@ -2,7 +2,16 @@
 
 import { useState } from "react";
 import { categoryStyle } from "@/lib/categories";
+import { timeToMinutes } from "@/lib/date";
 import type { ScheduleItem } from "@/lib/schedule";
+
+// Kaarthoogte schaalt mee met de duur, zodat een 5-minuten micro-pauze en een
+// 45-minuten schrijfblok visueel verschillend wegen. Ondergrens houdt korte
+// blokken nog leesbaar/aantikbaar; bovengrens voorkomt een onwerkbaar hoog blok.
+function cardMinHeight(startMin: number, endMin: number): number {
+  const duration = Math.max(endMin - startMin, 0);
+  return Math.max(56, Math.min(duration * 1.6, 240));
+}
 
 type BlockPatch = { start?: string; end?: string; taskText?: string | null; label?: string; removed?: boolean };
 type AppointmentPatch = { title?: string; startTime?: string; endTime?: string; notes?: string | null };
@@ -60,7 +69,10 @@ export function ItemCard({
   }
 
   return (
-    <div className={`rounded border-l-4 p-3 ${categoryStyle(item.category)}`}>
+    <div
+      className={`flex flex-col justify-center rounded border-l-4 p-3 ${categoryStyle(item.category)}`}
+      style={{ minHeight: cardMinHeight(timeToMinutes(item.start), timeToMinutes(item.end)) }}
+    >
       <div className="flex items-start justify-between gap-2">
         <div>
           <div className="text-xs tabular-nums text-neutral-500">
