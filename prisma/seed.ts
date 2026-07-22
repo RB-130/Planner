@@ -38,8 +38,8 @@ const weekday: BlockSeed[] = [
   { order: 13, label: "Seminars / lopend werk", category: "seminar_ongoing", startOffsetMinutes: 410, endOffsetMinutes: 450 },
   { order: 14, label: "Pauze", category: "break", startOffsetMinutes: 450, endOffsetMinutes: 465 },
   { order: 15, label: "Administratie", category: "admin", startOffsetMinutes: 465, endOffsetMinutes: 510 },
-  { order: 16, label: "Pauze (indien Blok 5 doorgaat)", category: "break", startOffsetMinutes: 510, endOffsetMinutes: 525 },
-  { order: 17, label: "Blok 5 (overig)", category: "block5", startOffsetMinutes: 525, endOffsetMinutes: 570 },
+  { order: 16, label: "Pauze (indien flexibele tijd doorgaat)", category: "break", startOffsetMinutes: 510, endOffsetMinutes: 525 },
+  { order: 17, label: "Flexibele tijd (zie Administratie)", category: "block5", startOffsetMinutes: 525, endOffsetMinutes: 570 },
   { order: 18, label: "Terugreis", category: "transit", startOffsetMinutes: 570, endOffsetMinutes: 600 },
   {
     order: 19,

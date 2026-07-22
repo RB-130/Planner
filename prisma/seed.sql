@@ -28,8 +28,8 @@ VALUES
   ('weekday-13', 'weekday', 13, 'Seminars / lopend werk',           410, 450, 'seminar_ongoing',  false, NULL,    NULL,    NOW(), NOW()),
   ('weekday-14', 'weekday', 14, 'Pauze',                            450, 465, 'break',            false, NULL,    NULL,    NOW(), NOW()),
   ('weekday-15', 'weekday', 15, 'Administratie',                    465, 510, 'admin',            false, NULL,    NULL,    NOW(), NOW()),
-  ('weekday-16', 'weekday', 16, 'Pauze (indien Blok 5 doorgaat)',   510, 525, 'break',            false, NULL,    NULL,    NOW(), NOW()),
-  ('weekday-17', 'weekday', 17, 'Blok 5 (overig)',                  525, 570, 'block5',           false, NULL,    NULL,    NOW(), NOW()),
+  ('weekday-16', 'weekday', 16, 'Pauze (indien flexibele tijd doorgaat)', 510, 525, 'break',      false, NULL,    NULL,    NOW(), NOW()),
+  ('weekday-17', 'weekday', 17, 'Flexibele tijd (zie Administratie)', 525, 570, 'block5',         false, NULL,    NULL,    NOW(), NOW()),
   ('weekday-18', 'weekday', 18, 'Terugreis',                        570, 600, 'transit',          false, NULL,    NULL,    NOW(), NOW()),
   ('weekday-19', 'weekday', 19, 'Sociaal/cultureel venster',        0,   0,   'evening',          true,  '18:00', '20:00', NOW(), NOW()),
 
