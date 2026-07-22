@@ -1,0 +1,77 @@
+// Prisma schema voor de PhD dagplanner.
+// dayType-waarden: "weekday" | "saturday" | "sunday"
+// Alle tijden in ScheduleBlock zijn in minuten-na-ontwaken (relatief), niet kloktijd —
+// zomer/winter is puur een verschuiving van de wektijd, de offsets zelf blijven gelijk.
+// Uitzondering: items met fixedClockTime = true (bv. kerkdienst, avondvenster) staan op
+// een vaste kloktijd, ongeacht seizoen of wektijd.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+// Eén rij per blok in een basissjabloon (winter-werkdag, zomer-werkdag, zaterdag, zondag).
+model ScheduleBlock {
+  id                 String   @id @default(cuid())
+  dayType            String
+  order              Int
+  label              String
+  startOffsetMinutes Int
+  endOffsetMinutes   Int
+  category           String
+  // Sommige items lopen op vaste kloktijd i.p.v. uren-na-ontwaken (bv. kerkdienst).
+  fixedClockTime     Boolean  @default(false)
+  fixedStart         String? // "HH:mm", alleen relevant als fixedClockTime = true
+  fixedEnd           String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  overrides DayOverride[]
+
+  @@index([dayType, order])
+}
+
+// Handmatige aanpassing van één sjabloonblok op één specifieke datum.
+model DayOverride {
+  id                   String        @id @default(cuid())
+  date                 String // "YYYY-MM-DD"
+  blockId              String
+  block                ScheduleBlock @relation(fields: [blockId], references: [id], onDelete: Cascade)
+  removed              Boolean       @default(false)
+  taskText             String?
+  overrideStartMinutes Int? // handmatige tijd, minuten-na-middernacht (00:00) van die datum
+  overrideEndMinutes   Int?
+  createdAt            DateTime      @default(now())
+  updatedAt            DateTime      @updatedAt
+
+  @@unique([date, blockId])
+  @@index([date])
+}
+
+// Overschrijving van de standaard wektijd voor één specifieke datum.
+model DaySettings {
+  id        String   @id @default(cuid())
+  date      String   @unique // "YYYY-MM-DD"
+  wakeTime  String // "HH:mm"
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Losse, eenmalige afspraak op vaste kloktijd (seminar, kerkdienst-achtig, etc.),
+// los van de 5 vaste blokken.
+model Appointment {
+  id        String   @id @default(cuid())
+  date      String // "YYYY-MM-DD"
+  title     String
+  startTime String // "HH:mm"
+  endTime   String // "HH:mm"
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([date])
+}
