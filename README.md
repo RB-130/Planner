@@ -5,10 +5,12 @@ uren-na-ontwaken (i.p.v. vaste kloktijden) met automatische zomer/wintertijd-shi
 
 ## Ontwikkelen
 
+Vereist een Postgres-database (bv. een gratis Neon-project — zie "Hosting" hieronder).
+
 ```bash
 npm install
-cp .env.example .env.local   # vul een eigen APP_PASSWORD in
-npm run db:migrate           # database + schema aanmaken
+cp .env.example .env.local   # vul DATABASE_URL en APP_PASSWORD in
+npm run db:migrate           # schema aanmaken
 npm run db:seed              # basissjablonen (werkdag/zaterdag/zondag) inladen
 npm run dev
 ```
@@ -18,9 +20,29 @@ Open [http://localhost:3000](http://localhost:3000).
 ## Stack
 
 - Next.js (App Router) + TypeScript
-- Prisma + SQLite (lokaal; bij hosting te vervangen door Postgres/Neon)
+- Prisma + Postgres (Neon)
 - dnd-kit voor de sleep-interactie
 - Eenvoudige wachtwoord-gate (`APP_PASSWORD`) i.p.v. volwaardig auth-systeem
+- Manifest voor "toevoegen aan beginscherm" op telefoon
+
+## Hosting (Vercel + Neon)
+
+1. Maak op [vercel.com](https://vercel.com) een nieuw project van deze GitHub-repo.
+2. Ga in het Vercel-project naar **Storage → Create Database → Neon (Postgres)**
+   en koppel die aan het project. Vercel zet dan zelf een `DATABASE_URL`
+   environment variable klaar (gebruik de *pooled* connectiestring als er een
+   keuze is).
+3. Voeg in **Settings → Environment Variables** ook `APP_PASSWORD` toe (een
+   zelfgekozen sterk wachtwoord).
+4. Deploy. De build (`npm run build`) draait automatisch `prisma migrate
+   deploy` vóór `next build`, dus het schema wordt bij elke deploy up-to-date
+   gebracht.
+5. Eenmalig na de eerste deploy: vul de basissjablonen met
+   `DATABASE_URL="<productie-url>" npm run db:seed` (lokaal uitgevoerd met de
+   productie-`DATABASE_URL`, of via `vercel env pull` gevolgd door dat
+   commando).
+6. Open de gedeployde URL op je telefoon en kies "Zet op beginscherm" om de
+   planner als app-icoon te gebruiken.
 
 ## Scope van deze versie
 

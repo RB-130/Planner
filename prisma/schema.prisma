@@ -11,7 +11,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
 }
 
 // Eén rij per blok in een basissjabloon (winter-werkdag, zomer-werkdag, zaterdag, zondag).
