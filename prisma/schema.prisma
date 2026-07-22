@@ -44,7 +44,10 @@ model DayOverride {
   removed              Boolean       @default(false)
   taskText             String?
   labelOverride        String? // handmatig aangepaste titel van het blok voor deze datum
-  overrideStartMinutes Int? // handmatige tijd, minuten-na-middernacht (00:00) van die datum
+  // Voor flexibele blokken: minuten-na-wektijd (net als het sjabloon), zodat het blok
+  // meeschuift bij een gewijzigde wektijd. Voor fixedClockTime-blokken: minuten-na-middernacht
+  // (absolute kloktijd), net als fixedStart/fixedEnd.
+  overrideStartMinutes Int?
   overrideEndMinutes   Int?
   createdAt            DateTime      @default(now())
   updatedAt            DateTime      @updatedAt

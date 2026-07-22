@@ -68,8 +68,21 @@ export function buildDaySchedule(
         ? timeToMinutes(block.fixedEnd!)
         : wakeMinutes + block.endOffsetMinutes;
 
-      const start = override?.overrideStartMinutes ?? defaultStart;
-      const end = override?.overrideEndMinutes ?? defaultEnd;
+      // Voor flexibele blokken is de override-tijd net als het sjabloon relatief aan de
+      // wektijd, zodat een handmatig verplaatst/bewerkt blok ook meeschuift bij een
+      // gewijzigde wektijd. Vaste-kloktijd blokken blijven altijd absolute kloktijd.
+      const start =
+        override?.overrideStartMinutes != null
+          ? block.fixedClockTime
+            ? override.overrideStartMinutes
+            : wakeMinutes + override.overrideStartMinutes
+          : defaultStart;
+      const end =
+        override?.overrideEndMinutes != null
+          ? block.fixedClockTime
+            ? override.overrideEndMinutes
+            : wakeMinutes + override.overrideEndMinutes
+          : defaultEnd;
 
       return {
         kind: "block" as const,

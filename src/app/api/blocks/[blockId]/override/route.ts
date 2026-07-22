@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { timeToMinutes } from "@/lib/date";
+import { getDefaultWakeTime } from "@/lib/schedule";
 
 const timeRegex = /^\d{2}:\d{2}$/;
 
@@ -33,6 +34,17 @@ export async function PATCH(
 
   const { date, start, end, removed, taskText, label } = parsed.data;
 
+  // Flexibele blokken slaan de override-tijd relatief aan de wektijd op (net als het
+  // sjabloon), zodat een handmatig verplaatst/bewerkt blok blijft meeschuiven bij een
+  // gewijzigde wektijd. Vaste-kloktijd blokken blijven absolute kloktijd.
+  let wakeMinutes = 0;
+  if (!block.fixedClockTime && (start !== undefined || end !== undefined)) {
+    const daySettings = await prisma.daySettings.findUnique({ where: { date } });
+    wakeMinutes = timeToMinutes(daySettings?.wakeTime ?? getDefaultWakeTime(date));
+  }
+  const toStored = (clockTime: string) =>
+    block.fixedClockTime ? timeToMinutes(clockTime) : timeToMinutes(clockTime) - wakeMinutes;
+
   const override = await prisma.dayOverride.upsert({
     where: { date_blockId: { date, blockId } },
     create: {
@@ -41,15 +53,15 @@ export async function PATCH(
       removed: removed ?? false,
       taskText: taskText ?? null,
       labelOverride: label ?? null,
-      overrideStartMinutes: start ? timeToMinutes(start) : null,
-      overrideEndMinutes: end ? timeToMinutes(end) : null,
+      overrideStartMinutes: start ? toStored(start) : null,
+      overrideEndMinutes: end ? toStored(end) : null,
     },
     update: {
       ...(removed !== undefined ? { removed } : {}),
       ...(taskText !== undefined ? { taskText } : {}),
       ...(label !== undefined ? { labelOverride: label } : {}),
-      ...(start !== undefined ? { overrideStartMinutes: timeToMinutes(start) } : {}),
-      ...(end !== undefined ? { overrideEndMinutes: timeToMinutes(end) } : {}),
+      ...(start !== undefined ? { overrideStartMinutes: toStored(start) } : {}),
+      ...(end !== undefined ? { overrideEndMinutes: toStored(end) } : {}),
     },
   });
 
