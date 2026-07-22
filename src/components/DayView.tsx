@@ -16,7 +16,7 @@ import { SortableRow } from "@/components/SortableRow";
 import { ItemCard } from "@/components/ItemCard";
 import { DateJumpForm } from "@/components/DateJumpForm";
 import { addDays, formatDateLong, isWithinPlannerRange, startOfWeek, timeToMinutes, minutesToTime } from "@/lib/date";
-import type { DaySchedule } from "@/lib/schedule";
+import { computeConflicts, type DaySchedule } from "@/lib/schedule";
 
 async function patchBlockOverride(
   blockId: string,
@@ -49,6 +49,14 @@ async function deleteAppointment(id: string) {
   await fetch(`/api/appointments/${id}`, { method: "DELETE" });
 }
 
+async function clearDay(date: string) {
+  await fetch("/api/schedule/day/clear", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ date }),
+  });
+}
+
 export function DayView({ initial }: { initial: DaySchedule }) {
   const [schedule, setSchedule] = useState(initial);
   const [wakeTimeInput, setWakeTimeInput] = useState(initial.wakeTime);
@@ -71,6 +79,7 @@ export function DayView({ initial }: { initial: DaySchedule }) {
 
   const activeItems = schedule.items.filter((i) => !i.removed);
   const removedItems = schedule.items.filter((i) => i.removed);
+  const conflicts = computeConflicts(activeItems);
 
   async function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event;
@@ -138,6 +147,15 @@ export function DayView({ initial }: { initial: DaySchedule }) {
     await reload();
   }
 
+  async function handleClearDay() {
+    const confirmed = window.confirm(
+      "Hele dag leegmaken? Blokken zijn daarna nog herstelbaar, afspraken worden definitief verwijderd."
+    );
+    if (!confirmed) return;
+    await clearDay(schedule.date);
+    await reload();
+  }
+
   async function handleAddAppointment() {
     if (!apptTitle.trim()) return;
     await fetch("/api/appointments", {
@@ -187,7 +205,14 @@ export function DayView({ initial }: { initial: DaySchedule }) {
         <DateJumpForm currentDate={schedule.date} buildHref={(date) => `/day/${date}`} />
       </div>
 
-      <h1 className="text-xl font-semibold capitalize">{formatDateLong(schedule.date)}</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-xl font-semibold capitalize">{formatDateLong(schedule.date)}</h1>
+        {activeItems.length > 0 && (
+          <button type="button" onClick={handleClearDay} className="text-sm text-red-600 hover:underline">
+            dag leegmaken
+          </button>
+        )}
+      </div>
 
       <div className="flex items-center gap-2 rounded border border-black/10 p-3 text-sm dark:border-white/10">
         <label htmlFor="wakeTime" className="text-neutral-500">
@@ -224,6 +249,7 @@ export function DayView({ initial }: { initial: DaySchedule }) {
               <SortableRow key={`${item.kind}:${item.id}`} id={`${item.kind}:${item.id}`}>
                 <ItemCard
                   item={item}
+                  conflictsWith={conflicts.get(`${item.kind}:${item.id}`)}
                   onSaveBlock={(blockId, patch) => patchBlockOverride(blockId, schedule.date, patch).then(reload)}
                   onSaveAppointment={(id, patch) => patchAppointment(id, patch).then(reload)}
                   onDeleteAppointment={(id) => deleteAppointment(id).then(reload)}

@@ -18,11 +18,13 @@ type AppointmentPatch = { title?: string; startTime?: string; endTime?: string; 
 
 export function ItemCard({
   item,
+  conflictsWith,
   onSaveBlock,
   onSaveAppointment,
   onDeleteAppointment,
 }: {
   item: ScheduleItem;
+  conflictsWith?: string[];
   onSaveBlock: (blockId: string, patch: BlockPatch) => Promise<void>;
   onSaveAppointment: (id: string, patch: AppointmentPatch) => Promise<void>;
   onDeleteAppointment: (id: string) => Promise<void>;
@@ -68,9 +70,13 @@ export function ItemCard({
     }
   }
 
+  const hasConflict = Boolean(conflictsWith && conflictsWith.length > 0);
+
   return (
     <div
-      className={`flex flex-col justify-center rounded border-l-4 p-3 ${categoryStyle(item.category)}`}
+      className={`flex flex-col justify-center rounded border-l-4 p-3 ${categoryStyle(item.category)} ${
+        hasConflict ? "ring-2 ring-red-500" : ""
+      }`}
       style={{ minHeight: cardMinHeight(timeToMinutes(item.start), timeToMinutes(item.end)) }}
     >
       <div className="flex items-start justify-between gap-2">
@@ -81,6 +87,11 @@ export function ItemCard({
           <div className="font-medium">{item.label}</div>
           {item.taskText && <div className="text-sm text-neutral-600 dark:text-neutral-300">{item.taskText}</div>}
           {item.notes && <div className="text-sm text-neutral-600 dark:text-neutral-300">{item.notes}</div>}
+          {hasConflict && (
+            <div className="mt-1 text-sm font-medium text-red-600 dark:text-red-400">
+              ⚠ Botst met: {conflictsWith!.join(", ")}
+            </div>
+          )}
         </div>
         <button
           type="button"

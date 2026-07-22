@@ -123,3 +123,22 @@ export function buildDaySchedule(
     items,
   };
 }
+
+// Botsingen puur op basis van tijdvergelijking — geen AI nodig. O(n^2) is
+// verwaarloosbaar bij de handvol items die een dag maximaal heeft.
+export function computeConflicts(items: ScheduleItem[]): Map<string, string[]> {
+  const map = new Map<string, string[]>();
+  for (let i = 0; i < items.length; i++) {
+    for (let j = i + 1; j < items.length; j++) {
+      const a = items[i];
+      const b = items[j];
+      const overlaps = timeToMinutes(a.start) < timeToMinutes(b.end) && timeToMinutes(b.start) < timeToMinutes(a.end);
+      if (!overlaps) continue;
+      const keyA = `${a.kind}:${a.id}`;
+      const keyB = `${b.kind}:${b.id}`;
+      map.set(keyA, [...(map.get(keyA) ?? []), b.label]);
+      map.set(keyB, [...(map.get(keyB) ?? []), a.label]);
+    }
+  }
+  return map;
+}

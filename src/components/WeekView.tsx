@@ -2,7 +2,7 @@ import Link from "next/link";
 import { addDays, formatDateShort, isWithinPlannerRange, startOfWeek } from "@/lib/date";
 import { categoryStyle } from "@/lib/categories";
 import { DateJumpForm } from "@/components/DateJumpForm";
-import type { DaySchedule } from "@/lib/schedule";
+import { computeConflicts, type DaySchedule } from "@/lib/schedule";
 
 export function WeekView({ weekStart, days }: { weekStart: string; days: DaySchedule[] }) {
   const prevWeek = addDays(weekStart, -7);
@@ -44,17 +44,28 @@ export function WeekView({ weekStart, days }: { weekStart: string; days: DaySche
           >
             <div className="text-sm font-medium capitalize">{formatDateShort(day.date)}</div>
             <div className="flex flex-col gap-1">
-              {day.items
-                .filter((i) => !i.removed)
-                .map((item) => (
-                  <div
-                    key={`${item.kind}:${item.id}`}
-                    className={`truncate rounded border-l-2 px-1 py-0.5 text-xs ${categoryStyle(item.category)}`}
-                    title={`${item.start}–${item.end} ${item.label}`}
-                  >
-                    {item.start} {item.label}
-                  </div>
-                ))}
+              {(() => {
+                const activeItems = day.items.filter((i) => !i.removed);
+                const conflicts = computeConflicts(activeItems);
+                return activeItems.map((item) => {
+                  const conflictLabels = conflicts.get(`${item.kind}:${item.id}`);
+                  const title = conflictLabels
+                    ? `${item.start}–${item.end} ${item.label} — botst met: ${conflictLabels.join(", ")}`
+                    : `${item.start}–${item.end} ${item.label}`;
+                  return (
+                    <div
+                      key={`${item.kind}:${item.id}`}
+                      className={`truncate rounded border-l-2 px-1 py-0.5 text-xs ${categoryStyle(item.category)} ${
+                        conflictLabels ? "ring-1 ring-red-500" : ""
+                      }`}
+                      title={title}
+                    >
+                      {conflictLabels ? "⚠ " : ""}
+                      {item.start} {item.label}
+                    </div>
+                  );
+                });
+              })()}
             </div>
           </Link>
         ))}
