@@ -32,17 +32,21 @@ Open [http://localhost:3000](http://localhost:3000).
    en koppel die aan het project. Vercel zet dan zelf een `DATABASE_URL`
    environment variable klaar (gebruik de *pooled* connectiestring als er een
    keuze is).
-3. Voeg in **Settings → Environment Variables** ook `APP_PASSWORD` toe (een
-   zelfgekozen sterk wachtwoord).
-4. Deploy. De build (`npm run build`) draait automatisch `prisma migrate
+3. Voeg zelf ook `DIRECT_DATABASE_URL` toe (Settings → Environment Variables):
+   dezelfde Neon-connectie maar dan de *directe/ongepoolde* variant (zónder
+   "-pooler" in de hostnaam, te vinden in de Neon Console bij Connection
+   Details). Nodig omdat migraties niet betrouwbaar werken via een pooler
+   (zie Troubleshooting hieronder).
+4. Voeg ook `APP_PASSWORD` toe (een zelfgekozen sterk wachtwoord).
+5. Deploy. De build (`npm run build`) draait automatisch `prisma migrate
    deploy` vóór `next build`, dus het schema wordt bij elke deploy up-to-date
    gebracht.
-5. Eenmalig na de eerste deploy: vul de basissjablonen met
+6. Eenmalig na de eerste deploy: vul de basissjablonen met
    `DATABASE_URL="<productie-url>" npm run db:seed` (lokaal uitgevoerd met de
    productie-`DATABASE_URL`, of via `vercel env pull` gevolgd door dat
    commando). Geen lokale Postgres-toegang? Draai in plaats daarvan
    `prisma/seed.sql` via de **SQL Editor** in de Neon Console.
-6. Open de gedeployde URL op je telefoon en kies "Zet op beginscherm" om de
+7. Open de gedeployde URL op je telefoon en kies "Zet op beginscherm" om de
    planner als app-icoon te gebruiken.
 
 ### Troubleshooting
@@ -61,6 +65,13 @@ Open [http://localhost:3000](http://localhost:3000).
   ná de laatste deploy, of staat niet aangevinkt voor de omgeving
   (Production/Preview) die je bezoekt. Los op en deploy opnieuw — env vars
   worden pas meegenomen bij de eerstvolgende build.
+- **Build faalt met `P1002` / "Timed out trying to acquire a postgres
+  advisory lock"**: `prisma migrate deploy` gebruikt een advisory lock, die
+  niet betrouwbaar werkt via een pooled/PgBouncer-verbinding (zoals Neon's
+  standaard "-pooler"-connectiestring). Zorg dat `DIRECT_DATABASE_URL` is
+  ingesteld met de *directe* (ongepoolde) Neon-connectiestring — zie stap 3
+  hierboven — en deploy opnieuw. Kan ook incidenteel optreden bij twee
+  gelijktijdige deploys; dan is simpelweg opnieuw deployen ook genoeg.
 
 ## Scope van deze versie
 
