@@ -22,28 +22,28 @@ type BlockSeed = {
 // winter en zomer (rule 2: seizoen is een rechte verschuiving van de wektijd).
 // fixedClockTime-items (avondvenster, kerkdienst) staan expliciet los van de wektijd.
 const weekday: BlockSeed[] = [
-  { order: 0, label: "Opstaan, klaarmaken", category: "prep", startOffsetMinutes: 0, endOffsetMinutes: 30 },
-  { order: 1, label: "Lezen", category: "reading", startOffsetMinutes: 30, endOffsetMinutes: 90 },
-  { order: 2, label: "Verplaatsing naar universiteit", category: "transit", startOffsetMinutes: 90, endOffsetMinutes: 120 },
-  { order: 3, label: "Schrijven", category: "writing", startOffsetMinutes: 120, endOffsetMinutes: 165 },
-  { order: 4, label: "Micro-pauze", category: "microbreak", startOffsetMinutes: 165, endOffsetMinutes: 170 },
-  { order: 5, label: "Schrijven", category: "writing", startOffsetMinutes: 170, endOffsetMinutes: 210 },
+  { order: 0, label: "Opstarten", category: "prep", startOffsetMinutes: 0, endOffsetMinutes: 30 },
+  { order: 1, label: "Leesblok", category: "reading", startOffsetMinutes: 30, endOffsetMinutes: 90 },
+  { order: 2, label: "Heenreis", category: "transit", startOffsetMinutes: 90, endOffsetMinutes: 120 },
+  { order: 3, label: "Schrijfblok", category: "writing", startOffsetMinutes: 120, endOffsetMinutes: 165 },
+  { order: 4, label: "Korte pauze", category: "microbreak", startOffsetMinutes: 165, endOffsetMinutes: 170 },
+  { order: 5, label: "Schrijfblok", category: "writing", startOffsetMinutes: 170, endOffsetMinutes: 210 },
   { order: 6, label: "Pauze", category: "break", startOffsetMinutes: 210, endOffsetMinutes: 225 },
-  { order: 7, label: "Revisie", category: "revision", startOffsetMinutes: 225, endOffsetMinutes: 270 },
-  { order: 8, label: "Micro-pauze", category: "microbreak", startOffsetMinutes: 270, endOffsetMinutes: 275 },
-  { order: 9, label: "Revisie", category: "revision", startOffsetMinutes: 275, endOffsetMinutes: 315 },
-  { order: 10, label: "Lunch + wandeling", category: "lunch", startOffsetMinutes: 315, endOffsetMinutes: 360 },
-  { order: 11, label: "Seminars / lopend werk", category: "seminar_ongoing", startOffsetMinutes: 360, endOffsetMinutes: 405 },
-  { order: 12, label: "Micro-pauze", category: "microbreak", startOffsetMinutes: 405, endOffsetMinutes: 410 },
-  { order: 13, label: "Seminars / lopend werk", category: "seminar_ongoing", startOffsetMinutes: 410, endOffsetMinutes: 450 },
+  { order: 7, label: "Revisieblok", category: "revision", startOffsetMinutes: 225, endOffsetMinutes: 270 },
+  { order: 8, label: "Korte pauze", category: "microbreak", startOffsetMinutes: 270, endOffsetMinutes: 275 },
+  { order: 9, label: "Revisieblok", category: "revision", startOffsetMinutes: 275, endOffsetMinutes: 315 },
+  { order: 10, label: "Middagpauze", category: "lunch", startOffsetMinutes: 315, endOffsetMinutes: 360 },
+  { order: 11, label: "Lopend-werkblok", category: "seminar_ongoing", startOffsetMinutes: 360, endOffsetMinutes: 405 },
+  { order: 12, label: "Korte pauze", category: "microbreak", startOffsetMinutes: 405, endOffsetMinutes: 410 },
+  { order: 13, label: "Lopend-werkblok", category: "seminar_ongoing", startOffsetMinutes: 410, endOffsetMinutes: 450 },
   { order: 14, label: "Pauze", category: "break", startOffsetMinutes: 450, endOffsetMinutes: 465 },
-  { order: 15, label: "Administratie", category: "admin", startOffsetMinutes: 465, endOffsetMinutes: 510 },
-  { order: 16, label: "Pauze (indien flexibele tijd doorgaat)", category: "break", startOffsetMinutes: 510, endOffsetMinutes: 525 },
-  { order: 17, label: "Flexibele tijd (zie Administratie)", category: "block5", startOffsetMinutes: 525, endOffsetMinutes: 570 },
+  { order: 15, label: "Administratieblok", category: "admin", startOffsetMinutes: 465, endOffsetMinutes: 510 },
+  { order: 16, label: "Pauze (indien Reserveblok doorgaat)", category: "break", startOffsetMinutes: 510, endOffsetMinutes: 525 },
+  { order: 17, label: "Reserveblok", category: "block5", startOffsetMinutes: 525, endOffsetMinutes: 570 },
   { order: 18, label: "Terugreis", category: "transit", startOffsetMinutes: 570, endOffsetMinutes: 600 },
   {
     order: 19,
-    label: "Sociaal/cultureel venster",
+    label: "Avondblok",
     category: "evening",
     startOffsetMinutes: 0,
     endOffsetMinutes: 0,
@@ -54,8 +54,8 @@ const weekday: BlockSeed[] = [
 ];
 
 const saturday: BlockSeed[] = [
-  { order: 0, label: "Opstaan, klaarmaken", category: "prep", startOffsetMinutes: 0, endOffsetMinutes: 45 },
-  { order: 1, label: "Lezen", category: "reading", startOffsetMinutes: 45, endOffsetMinutes: 135 },
+  { order: 0, label: "Opstarten", category: "prep", startOffsetMinutes: 0, endOffsetMinutes: 45 },
+  { order: 1, label: "Leesblok", category: "reading", startOffsetMinutes: 45, endOffsetMinutes: 135 },
   {
     order: 2,
     label: "Weekboodschappen (flexibel, versleep naar wens)",
@@ -66,8 +66,8 @@ const saturday: BlockSeed[] = [
 ];
 
 const sunday: BlockSeed[] = [
-  { order: 0, label: "Opstaan, klaarmaken", category: "prep", startOffsetMinutes: 0, endOffsetMinutes: 30 },
-  { order: 1, label: "Lezen", category: "reading", startOffsetMinutes: 30, endOffsetMinutes: 90 },
+  { order: 0, label: "Opstarten", category: "prep", startOffsetMinutes: 0, endOffsetMinutes: 30 },
+  { order: 1, label: "Leesblok", category: "reading", startOffsetMinutes: 30, endOffsetMinutes: 90 },
   {
     order: 2,
     label: "Kerkdienst",
