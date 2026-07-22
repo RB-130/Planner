@@ -11,6 +11,7 @@ const patchSchema = z.object({
   end: z.string().regex(timeRegex).optional(),
   removed: z.boolean().optional(),
   taskText: z.string().nullable().optional(),
+  label: z.string().min(1).nullable().optional(),
 });
 
 export async function PATCH(
@@ -30,7 +31,7 @@ export async function PATCH(
     return NextResponse.json({ error: "Blok niet gevonden" }, { status: 404 });
   }
 
-  const { date, start, end, removed, taskText } = parsed.data;
+  const { date, start, end, removed, taskText, label } = parsed.data;
 
   const override = await prisma.dayOverride.upsert({
     where: { date_blockId: { date, blockId } },
@@ -39,12 +40,14 @@ export async function PATCH(
       blockId,
       removed: removed ?? false,
       taskText: taskText ?? null,
+      labelOverride: label ?? null,
       overrideStartMinutes: start ? timeToMinutes(start) : null,
       overrideEndMinutes: end ? timeToMinutes(end) : null,
     },
     update: {
       ...(removed !== undefined ? { removed } : {}),
       ...(taskText !== undefined ? { taskText } : {}),
+      ...(label !== undefined ? { labelOverride: label } : {}),
       ...(start !== undefined ? { overrideStartMinutes: timeToMinutes(start) } : {}),
       ...(end !== undefined ? { overrideEndMinutes: timeToMinutes(end) } : {}),
     },

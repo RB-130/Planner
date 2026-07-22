@@ -43,6 +43,7 @@ model DayOverride {
   block                ScheduleBlock @relation(fields: [blockId], references: [id], onDelete: Cascade)
   removed              Boolean       @default(false)
   taskText             String?
+  labelOverride        String? // handmatig aangepaste titel van het blok voor deze datum
   overrideStartMinutes Int? // handmatige tijd, minuten-na-middernacht (00:00) van die datum
   overrideEndMinutes   Int?
   createdAt            DateTime      @default(now())

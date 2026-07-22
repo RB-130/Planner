@@ -20,7 +20,7 @@ import type { DaySchedule } from "@/lib/schedule";
 async function patchBlockOverride(
   blockId: string,
   date: string,
-  patch: { start?: string; end?: string; taskText?: string | null; removed?: boolean }
+  patch: { start?: string; end?: string; taskText?: string | null; label?: string; removed?: boolean }
 ) {
   await fetch(`/api/blocks/${blockId}/override`, {
     method: "PATCH",
@@ -80,27 +80,42 @@ export function DayView({ initial }: { initial: DaySchedule }) {
     if (oldIndex === -1 || newIndex === -1) return;
 
     const reordered = arrayMove(activeItems, oldIndex, newIndex);
-    const moved = reordered[newIndex];
-    const previous = reordered[newIndex - 1];
 
-    const durationMinutes = timeToMinutes(moved.end) - timeToMinutes(moved.start);
-    const newStartMinutes = previous ? timeToMinutes(previous.end) : timeToMinutes(schedule.wakeTime);
-    const newStart = minutesToTime(newStartMinutes);
-    const newEnd = minutesToTime(newStartMinutes + Math.max(durationMinutes, 5));
+    // Cascade: vaste-kloktijd items (afspraken, fixedClockTime-blokken) blijven op hun eigen
+    // tijd staan; flexibele blokken schuiven na elkaar op in de nieuwe volgorde, zodat er geen
+    // overlap ontstaat door het verslepen van één blok.
+    let cursor = timeToMinutes(schedule.wakeTime);
+    const recomputed = reordered.map((item) => {
+      if (item.fixedTime) {
+        cursor = Math.max(cursor, timeToMinutes(item.end));
+        return item;
+      }
+      const durationMinutes = Math.max(timeToMinutes(item.end) - timeToMinutes(item.start), 5);
+      const newStart = cursor;
+      const newEnd = cursor + durationMinutes;
+      cursor = newEnd;
+      return { ...item, start: minutesToTime(newStart), end: minutesToTime(newEnd) };
+    });
+
+    const changed = recomputed.filter((item, i) => {
+      const original = reordered[i];
+      return item.start !== original.start || item.end !== original.end;
+    });
 
     // Optimistisch bijwerken zodat de lijst niet terugspringt tijdens het opslaan.
+    const byKey = new Map(recomputed.map((item) => [`${item.kind}:${item.id}`, item]));
     setSchedule((s) => ({
       ...s,
-      items: s.items.map((i) =>
-        i.id === moved.id && i.kind === moved.kind ? { ...i, start: newStart, end: newEnd } : i
-      ),
+      items: s.items.map((i) => byKey.get(`${i.kind}:${i.id}`) ?? i),
     }));
 
-    if (moved.kind === "block") {
-      await patchBlockOverride(moved.sourceBlockId!, schedule.date, { start: newStart, end: newEnd });
-    } else {
-      await patchAppointment(moved.id, { startTime: newStart, endTime: newEnd });
-    }
+    await Promise.all(
+      changed.map((item) =>
+        item.kind === "block"
+          ? patchBlockOverride(item.sourceBlockId!, schedule.date, { start: item.start, end: item.end })
+          : patchAppointment(item.id, { startTime: item.start, endTime: item.end })
+      )
+    );
     await reload();
   }
 

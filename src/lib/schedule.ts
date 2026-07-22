@@ -27,6 +27,9 @@ export type ScheduleItem = {
   removed: boolean;
   taskText: string | null;
   notes?: string | null;
+  // Vaste-kloktijd items (fixedClockTime-blokken en afspraken) verschuiven niet mee
+  // wanneer de rest van de dag herschikt wordt door te slepen.
+  fixedTime: boolean;
 };
 
 export type DaySchedule = {
@@ -72,12 +75,13 @@ export function buildDaySchedule(
         kind: "block" as const,
         id: block.id,
         sourceBlockId: block.id,
-        label: block.label,
+        label: override?.labelOverride ?? block.label,
         category: block.category,
         start: minutesToTime(start),
         end: minutesToTime(end),
         removed: override?.removed ?? false,
         taskText: override?.taskText ?? null,
+        fixedTime: block.fixedClockTime,
       };
     });
 
@@ -91,6 +95,7 @@ export function buildDaySchedule(
     removed: false,
     taskText: null,
     notes: appt.notes,
+    fixedTime: true,
   }));
 
   const items = [...blockItems, ...appointmentItems].sort((a, b) =>

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { categoryStyle } from "@/lib/categories";
 import type { ScheduleItem } from "@/lib/schedule";
 
-type BlockPatch = { start?: string; end?: string; taskText?: string | null; removed?: boolean };
+type BlockPatch = { start?: string; end?: string; taskText?: string | null; label?: string; removed?: boolean };
 type AppointmentPatch = { title?: string; startTime?: string; endTime?: string; notes?: string | null };
 
 export function ItemCard({
@@ -30,11 +30,12 @@ export function ItemCard({
     setSaving(true);
     try {
       if (item.kind === "block") {
-        // Tijd alleen meesturen als die daadwerkelijk gewijzigd is: anders bevriest een
+        // Tijd/titel alleen meesturen als die daadwerkelijk gewijzigd zijn: anders bevriest een
         // simpele taak-notitie het blok op de huidige tijd en volgt het niet langer de wektijd.
         const patch: BlockPatch = { taskText: taskText || null };
         if (start !== item.start) patch.start = start;
         if (end !== item.end) patch.end = end;
+        if (title !== item.label) patch.label = title;
         await onSaveBlock(item.sourceBlockId!, patch);
       } else {
         await onSaveAppointment(item.id, { title, startTime: start, endTime: end, notes: notes || null });
@@ -80,14 +81,12 @@ export function ItemCard({
 
       {editing && (
         <div className="mt-3 flex flex-col gap-2 border-t border-black/10 pt-3 dark:border-white/10">
-          {item.kind === "appointment" && (
-            <input
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="Titel"
-              className="rounded border border-black/20 px-2 py-1 text-sm dark:border-white/20 dark:bg-black"
-            />
-          )}
+          <input
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="Titel"
+            className="rounded border border-black/20 px-2 py-1 text-sm dark:border-white/20 dark:bg-black"
+          />
           <div className="flex gap-2">
             <input
               type="time"
