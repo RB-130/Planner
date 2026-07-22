@@ -40,9 +40,27 @@ Open [http://localhost:3000](http://localhost:3000).
 5. Eenmalig na de eerste deploy: vul de basissjablonen met
    `DATABASE_URL="<productie-url>" npm run db:seed` (lokaal uitgevoerd met de
    productie-`DATABASE_URL`, of via `vercel env pull` gevolgd door dat
-   commando).
+   commando). Geen lokale Postgres-toegang? Draai in plaats daarvan
+   `prisma/seed.sql` via de **SQL Editor** in de Neon Console.
 6. Open de gedeployde URL op je telefoon en kies "Zet op beginscherm" om de
    planner als app-icoon te gebruiken.
+
+### Troubleshooting
+
+- **"No Next.js version detected" / "No Output Directory named 'public'"**:
+  het Vercel-project bouwt de verkeerde branch of Framework Preset staat niet
+  op Next.js. Check **Settings → Build and Deployment → Framework Preset**
+  (moet **Next.js** zijn) en **Settings → Git → Production Branch** (moet de
+  branch zijn waarop de app-code staat, niet per se `main`).
+- **"Redeploy" op een oude, mislukte deploy blijft dezelfde fout geven**:
+  logisch — die knop bouwt exact dezelfde oude commit/branch opnieuw, ook na
+  het aanpassen van instellingen. Gebruik **Deployments → Create Deployment**
+  om een verse deploy op de juiste branch te starten, of push een nieuw
+  commit.
+- **"APP_PASSWORD ontbreekt"**: de environment variable is toegevoegd/gewijzigd
+  ná de laatste deploy, of staat niet aangevinkt voor de omgeving
+  (Production/Preview) die je bezoekt. Los op en deploy opnieuw — env vars
+  worden pas meegenomen bij de eerstvolgende build.
 
 ## Scope van deze versie
 
