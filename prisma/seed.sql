@@ -35,7 +35,7 @@ VALUES
 
   ('saturday-0', 'saturday', 0, 'Opstarten',                                            0,   45,  'prep',    false, NULL, NULL, NOW(), NOW()),
   ('saturday-1', 'saturday', 1, 'Leesblok',                                             45,  135, 'reading', false, NULL, NULL, NOW(), NOW()),
-  ('saturday-2', 'saturday', 2, 'Weekboodschappen (flexibel, versleep naar wens)',      390, 450, 'errand',  false, NULL, NULL, NOW(), NOW()),
+  ('saturday-2', 'saturday', 2, 'Boodschappen',                                        390, 450, 'errand',  false, NULL, NULL, NOW(), NOW()),
 
   ('sunday-0',   'sunday',   0, 'Opstarten', 0,  30, 'prep',    false, NULL,    NULL,    NOW(), NOW()),
   ('sunday-1',   'sunday',   1, 'Leesblok',  30, 90, 'reading', false, NULL,    NULL,    NOW(), NOW()),

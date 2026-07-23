@@ -58,7 +58,7 @@ const saturday: BlockSeed[] = [
   { order: 1, label: "Leesblok", category: "reading", startOffsetMinutes: 45, endOffsetMinutes: 135 },
   {
     order: 2,
-    label: "Weekboodschappen (flexibel, versleep naar wens)",
+    label: "Boodschappen",
     category: "errand",
     startOffsetMinutes: 390,
     endOffsetMinutes: 450,
