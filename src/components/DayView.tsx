@@ -15,7 +15,15 @@ import { SortableContext, arrayMove, verticalListSortingStrategy } from "@dnd-ki
 import { SortableRow } from "@/components/SortableRow";
 import { ItemCard } from "@/components/ItemCard";
 import { DateJumpForm } from "@/components/DateJumpForm";
-import { addDays, formatDateLong, isWithinPlannerRange, startOfWeek, timeToMinutes, minutesToTime } from "@/lib/date";
+import {
+  PLANNER_END,
+  addDays,
+  formatDateLong,
+  isWithinPlannerRange,
+  startOfWeek,
+  timeToMinutes,
+  minutesToTime,
+} from "@/lib/date";
 import { computeConflicts, type DaySchedule } from "@/lib/schedule";
 
 async function patchBlockOverride(
@@ -49,11 +57,11 @@ async function deleteAppointment(id: string) {
   await fetch(`/api/appointments/${id}`, { method: "DELETE" });
 }
 
-async function clearDay(date: string) {
+async function clearDay(date: string, endDate?: string) {
   await fetch("/api/schedule/day/clear", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ date }),
+    body: JSON.stringify({ date, endDate }),
   });
 }
 
@@ -64,6 +72,8 @@ export function DayView({ initial }: { initial: DaySchedule }) {
   const [apptTitle, setApptTitle] = useState("");
   const [apptStart, setApptStart] = useState("18:00");
   const [apptEnd, setApptEnd] = useState("19:00");
+  const [showClearRangeForm, setShowClearRangeForm] = useState(false);
+  const [clearRangeEnd, setClearRangeEnd] = useState(initial.date);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
@@ -156,6 +166,18 @@ export function DayView({ initial }: { initial: DaySchedule }) {
     await reload();
   }
 
+  async function handleClearRange() {
+    const endDate = clearRangeEnd > PLANNER_END ? PLANNER_END : clearRangeEnd;
+    if (endDate < schedule.date) return;
+    const confirmed = window.confirm(
+      `Alle dagen van ${schedule.date} t/m ${endDate} leegmaken? Blokken zijn daarna nog per dag herstelbaar, afspraken worden definitief verwijderd.`
+    );
+    if (!confirmed) return;
+    await clearDay(schedule.date, endDate);
+    setShowClearRangeForm(false);
+    await reload();
+  }
+
   async function handleAddAppointment() {
     if (!apptTitle.trim()) return;
     await fetch("/api/appointments", {
@@ -207,12 +229,49 @@ export function DayView({ initial }: { initial: DaySchedule }) {
 
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold capitalize">{formatDateLong(schedule.date)}</h1>
-        {activeItems.length > 0 && (
-          <button type="button" onClick={handleClearDay} className="text-sm text-red-600 hover:underline">
-            dag leegmaken
+        <div className="flex items-center gap-3">
+          {activeItems.length > 0 && (
+            <button type="button" onClick={handleClearDay} className="text-sm text-red-600 hover:underline">
+              dag leegmaken
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={() => setShowClearRangeForm((v) => !v)}
+            className="text-sm text-red-600 hover:underline"
+          >
+            periode leegmaken
           </button>
-        )}
+        </div>
       </div>
+
+      {showClearRangeForm && (
+        <div className="flex flex-wrap items-center gap-2 rounded border border-red-200 p-3 text-sm dark:border-red-900">
+          <span className="text-neutral-500">Van {schedule.date} t/m</span>
+          <input
+            type="date"
+            value={clearRangeEnd}
+            min={schedule.date}
+            max={PLANNER_END}
+            onChange={(e) => setClearRangeEnd(e.target.value)}
+            className="rounded border border-black/20 px-2 py-1 dark:border-white/20 dark:bg-black"
+          />
+          <button
+            type="button"
+            onClick={handleClearRange}
+            className="rounded bg-red-600 px-2 py-1 text-white hover:bg-red-700"
+          >
+            Leegmaken
+          </button>
+          <button
+            type="button"
+            onClick={() => setShowClearRangeForm(false)}
+            className="text-neutral-500 hover:underline"
+          >
+            Annuleren
+          </button>
+        </div>
+      )}
 
       <div className="flex items-center gap-2 rounded border border-black/10 p-3 text-sm dark:border-white/10">
         <label htmlFor="wakeTime" className="text-neutral-500">
