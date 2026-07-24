@@ -85,8 +85,12 @@ export function ItemCard({
             {item.start}–{item.end}
           </div>
           <div className="font-medium">{item.label}</div>
-          {item.taskText && <div className="text-sm text-neutral-600 dark:text-neutral-300">{item.taskText}</div>}
-          {item.notes && <div className="text-sm text-neutral-600 dark:text-neutral-300">{item.notes}</div>}
+          {item.taskText && (
+            <div className="whitespace-pre-wrap text-sm text-neutral-600 dark:text-neutral-300">{item.taskText}</div>
+          )}
+          {item.notes && (
+            <div className="whitespace-pre-wrap text-sm text-neutral-600 dark:text-neutral-300">{item.notes}</div>
+          )}
           {hasConflict && (
             <div className="mt-1 text-sm font-medium text-red-600 dark:text-red-400">
               ⚠ Botst met: {conflictsWith!.join(", ")}
@@ -125,17 +129,19 @@ export function ItemCard({
             />
           </div>
           {item.kind === "block" ? (
-            <input
+            <textarea
               value={taskText}
               onChange={(e) => setTaskText(e.target.value)}
               placeholder="Specifieke taak (optioneel)"
+              rows={3}
               className="rounded border border-black/20 px-2 py-1 text-sm dark:border-white/20 dark:bg-black"
             />
           ) : (
-            <input
+            <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="Notitie (optioneel)"
+              rows={3}
               className="rounded border border-black/20 px-2 py-1 text-sm dark:border-white/20 dark:bg-black"
             />
           )}
