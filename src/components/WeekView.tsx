@@ -1,5 +1,12 @@
 import Link from "next/link";
-import { addDays, formatDateShort, isWithinPlannerRange, startOfWeek } from "@/lib/date";
+import {
+  addDays,
+  clampToPlannerRange,
+  formatDateShort,
+  isWithinPlannerRange,
+  startOfWeek,
+  todayDateKey,
+} from "@/lib/date";
 import { categoryStyle } from "@/lib/categories";
 import { DateJumpForm } from "@/components/DateJumpForm";
 import { computeConflicts, type DaySchedule } from "@/lib/schedule";
@@ -7,6 +14,7 @@ import { computeConflicts, type DaySchedule } from "@/lib/schedule";
 export function WeekView({ weekStart, days }: { weekStart: string; days: DaySchedule[] }) {
   const prevWeek = addDays(weekStart, -7);
   const nextWeek = addDays(weekStart, 7);
+  const currentWeekStart = startOfWeek(clampToPlannerRange(todayDateKey()));
 
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-4 p-4">
@@ -19,7 +27,14 @@ export function WeekView({ weekStart, days }: { weekStart: string; days: DaySche
         >
           ← vorige week
         </Link>
-        <h1 className="text-lg font-semibold">Week van {formatDateShort(weekStart)}</h1>
+        <div className="flex flex-col items-center gap-1">
+          <h1 className="text-lg font-semibold">Week van {formatDateShort(weekStart)}</h1>
+          {weekStart !== currentWeekStart && (
+            <Link href={`/week/${currentWeekStart}`} className="text-sm text-neutral-500 hover:underline">
+              deze week
+            </Link>
+          )}
+        </div>
         <Link
           href={isWithinPlannerRange(nextWeek) ? `/week/${nextWeek}` : "#"}
           className={`rounded px-2 py-1 text-sm ${

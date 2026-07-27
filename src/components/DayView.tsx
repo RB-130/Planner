@@ -18,10 +18,12 @@ import { DateJumpForm } from "@/components/DateJumpForm";
 import {
   PLANNER_END,
   addDays,
+  clampToPlannerRange,
   formatDateLong,
   isWithinPlannerRange,
   startOfWeek,
   timeToMinutes,
+  todayDateKey,
   minutesToTime,
 } from "@/lib/date";
 import { computeConflicts, type DaySchedule } from "@/lib/schedule";
@@ -197,6 +199,7 @@ export function DayView({ initial }: { initial: DaySchedule }) {
 
   const prevDate = addDays(schedule.date, -1);
   const nextDate = addDays(schedule.date, 1);
+  const todayDate = clampToPlannerRange(todayDateKey());
 
   return (
     <div className="mx-auto flex max-w-xl flex-col gap-4 p-4 pb-24">
@@ -209,9 +212,19 @@ export function DayView({ initial }: { initial: DaySchedule }) {
         >
           ← vorige dag
         </Link>
-        <Link href={`/week/${startOfWeek(schedule.date)}`} className="text-sm text-neutral-500 hover:underline">
-          weekoverzicht
-        </Link>
+        <div className="flex items-center gap-2 text-sm text-neutral-500">
+          <Link href={`/week/${startOfWeek(schedule.date)}`} className="hover:underline">
+            weekoverzicht
+          </Link>
+          {schedule.date !== todayDate && (
+            <>
+              <span>·</span>
+              <Link href={`/day/${todayDate}`} className="hover:underline">
+                vandaag
+              </Link>
+            </>
+          )}
+        </div>
         <Link
           href={isWithinPlannerRange(nextDate) ? `/day/${nextDate}` : "#"}
           className={`rounded px-2 py-1 text-sm ${
